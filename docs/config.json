@@ -1,0 +1,192 @@
+{
+  "release": "0.4.0-browser",
+  "local": true,
+  "auth_ready": true,
+  "auth_mode": "browser",
+  "ai_ready": false,
+  "ai_note": "AI接続は設定待ちです。画像・自由文は原本を見ながら入力してください。",
+  "fields": {
+    "property_name": {
+      "cell": "F4",
+      "label": "物件名"
+    },
+    "price_yen": {
+      "cell": "F5",
+      "label": "価格（税込）"
+    },
+    "full_annual_income_yen": {
+      "cell": "K7",
+      "label": "満室年間収益"
+    },
+    "current_annual_income_yen": {
+      "cell": "K9",
+      "label": "現況年間収益"
+    },
+    "address": {
+      "cell": "K11",
+      "label": "住居表示"
+    },
+    "parcel_address": {
+      "cell": "K12",
+      "label": "地番"
+    },
+    "transport": {
+      "cell": "F13",
+      "label": "交通"
+    },
+    "land_right": {
+      "cell": "F15",
+      "label": "土地権利"
+    },
+    "land_category": {
+      "cell": "F17",
+      "label": "地目"
+    },
+    "land_area_basis": {
+      "cell": "F19",
+      "label": "面積基準"
+    },
+    "land_area_m2": {
+      "cell": "K19",
+      "label": "土地面積"
+    },
+    "road_value_yen_m2": {
+      "cell": "K21",
+      "label": "路線価単価"
+    },
+    "road_direction_width": {
+      "cell": "K23",
+      "label": "道路方角・幅員"
+    },
+    "road_type": {
+      "cell": "Y23",
+      "label": "道路種類"
+    },
+    "building_type": {
+      "cell": "F26",
+      "label": "建物種類"
+    },
+    "structure": {
+      "cell": "F28",
+      "label": "構造"
+    },
+    "building_area_m2": {
+      "cell": "K30",
+      "label": "床面積"
+    },
+    "built_date": {
+      "cell": "K32",
+      "label": "築年月日"
+    },
+    "units": {
+      "cell": "K34",
+      "label": "総戸数"
+    },
+    "unit_mix": {
+      "cell": "Y34",
+      "label": "間取"
+    },
+    "zoning_area": {
+      "cell": "K37",
+      "label": "区域区分"
+    },
+    "land_use_zone": {
+      "cell": "Y37",
+      "label": "用途地域"
+    },
+    "building_coverage_pct": {
+      "cell": "M39",
+      "label": "建ぺい率"
+    },
+    "floor_area_ratio_pct": {
+      "cell": "AA39",
+      "label": "容積率"
+    },
+    "fire_zone": {
+      "cell": "K41",
+      "label": "防火地域"
+    },
+    "height_district": {
+      "cell": "Y41",
+      "label": "高度地区"
+    },
+    "min_site_area": {
+      "cell": "K43",
+      "label": "敷地規模の最低限度"
+    },
+    "absolute_height": {
+      "cell": "Y43",
+      "label": "絶対高さ"
+    },
+    "other_restrictions": {
+      "cell": "K45",
+      "label": "その他制限"
+    },
+    "handover": {
+      "cell": "F48",
+      "label": "引き渡し時期"
+    },
+    "transaction": {
+      "cell": "F49",
+      "label": "取引形態"
+    },
+    "remarks": {
+      "cell": "F50",
+      "label": "備考"
+    },
+    "company_name": {
+      "cell": "Y55",
+      "label": "社名"
+    },
+    "company_address": {
+      "cell": "Y56",
+      "label": "会社住所"
+    },
+    "company_phone": {
+      "cell": "Y57",
+      "label": "会社電話"
+    },
+    "agent": {
+      "cell": "Y58",
+      "label": "担当"
+    }
+  },
+  "numeric_fields": [
+    "price_yen",
+    "full_annual_income_yen",
+    "current_annual_income_yen",
+    "land_area_m2",
+    "road_value_yen_m2",
+    "building_area_m2",
+    "building_coverage_pct",
+    "floor_area_ratio_pct"
+  ],
+  "defaults": {
+    "company_name": "株式会社Enjin-AssetManagement",
+    "company_address": "東京都中央区銀座5-13-16",
+    "company_phone": "03-5005-0123",
+    "agent": "清水"
+  },
+  "manual_only": [
+    "price_yen",
+    "transport",
+    "road_value_yen_m2",
+    "road_direction_width",
+    "road_type",
+    "transaction"
+  ],
+  "types": {
+    "notes": "入力メモ",
+    "map": "住宅地図",
+    "land": "土地謄本",
+    "building": "建物謄本",
+    "drawing": "建物図面",
+    "rentroll": "レントロール",
+    "management": "管理委託契約書",
+    "tax": "固定資産税評価証明書",
+    "repair": "修繕履歴",
+    "zoning": "用途地域図",
+    "unknown": "未分類"
+  },
+  "remarks_limit": 420
+}

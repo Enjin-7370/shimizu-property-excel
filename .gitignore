@@ -1,0 +1,6 @@
+__pycache__/
+node_modules/
+tests/results/
+tests/*_output.xlsx
+.env*
+!.env.example
