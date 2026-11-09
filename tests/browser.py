@@ -24,6 +24,13 @@ with sync_playwright() as p:
     page.on('pageerror',lambda e:errors.append(str(e)))
     context.on('request',lambda r:requests.append({'url':r.url,'method':r.method,'body':r.post_data}))
     page.goto('http://127.0.0.1:7070',timeout=30000)
+    assert page.locator('#entryGate').is_visible()
+    assert not page.locator('#workspaceApp').is_visible()
+    page.locator('#entryPassword').fill('incorrect-password');page.locator('#entrySubmit').click()
+    page.wait_for_function("document.querySelector('#entryMessage').textContent.includes('違います')")
+    assert not page.locator('#workspaceApp').is_visible()
+    assert not any('application.zip' in r['url'] or 'pyodide' in r['url'] for r in requests)
+    page.locator('#entryPassword').fill(os.environ['SHIMIZU_ENTRY_PASSWORD']);page.locator('#entrySubmit').click()
     page.wait_for_selector('#field-property_name')
     page.locator('#sample').click();page.locator('#extract').click()
     page.wait_for_function("!busy",timeout=180000)
@@ -87,7 +94,7 @@ with sync_playwright() as p:
     assert page.locator('#field-land_area_m2').input_value()=='234'
     assert not errors,errors
     assert all(r['method']=='GET' and r['body'] is None for r in requests),requests
-    result={'passed':True,'checks':['text extraction','price stays manual','yield','manual correction retained','xlsx download','state save','reset','state restore','preview','mobile width','stale automatic cleared','xlsx intake','csv rentroll intake','rentroll current 720000','rentroll full 1560000','rentroll apply','PDF Japanese text extraction','PDF numeric extraction','no script errors','no outbound upload'],'requests':requests}
+    result={'passed':True,'checks':['entry locked initially','incorrect password refused','engine not loaded before unlock','correct password unlock','text extraction','price stays manual','yield','manual correction retained','xlsx download','state save','reset','state restore','preview','mobile width','stale automatic cleared','xlsx intake','csv rentroll intake','rentroll current 720000','rentroll full 1560000','rentroll apply','PDF Japanese text extraction','PDF numeric extraction','no script errors','no outbound upload'],'requests':requests}
     (OUT/'browser_results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({'passed':True,'checks':len(result['checks'])}))
     b.close()

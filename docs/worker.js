@@ -1,4 +1,4 @@
-const APP_SHA="ca8ea4cc90aae625f964a98defbf0c8583136fbe2756187f678c0b318a43e424";
+const APP_SHA="e8e41aef71226e32b915eee9d1e1c14008f967a066102a35c212a137ce6b4fa2";
 'use strict';
 // No uploaded data is used in URLs or outbound requests. All processing is in RAM.
 const runtimeURL='https://cdn.jsdelivr.net/pyodide/v0.29.3/full/';

@@ -18,7 +18,7 @@ sha=hashlib.sha256((OUT/'application.zip').read_bytes()).hexdigest()
 worker=(OUT/'worker.js').read_text()
 worker=re.sub(r'^const APP_SHA=.*?;\n','',worker)
 (OUT/'worker.js').write_text('const APP_SHA='+json.dumps(sha)+';\n'+worker)
-config=dict(release='0.4.0-browser',local=True,auth_ready=True,auth_mode='browser',ai_ready=False,
+config=dict(release='0.4.1-browser',local=True,auth_ready=True,auth_mode='browser',ai_ready=False,
     ai_note='AI接続は設定待ちです。画像・自由文は原本を見ながら入力してください。',
     fields=spec['fields'],numeric_fields=spec['numeric_fields'],defaults=spec['default_company'],
     manual_only=spec['manual_only'],types={'notes':'入力メモ','map':'住宅地図','land':'土地謄本','building':'建物謄本','drawing':'建物図面','rentroll':'レントロール','management':'管理委託契約書','tax':'固定資産税評価証明書','repair':'修繕履歴','zoning':'用途地域図','unknown':'未分類'},remarks_limit=spec['limits']['remarks_chars'])
@@ -41,6 +41,11 @@ html=html.replace('<head>','<head><meta http-equiv="Content-Security-Policy" con
 html=html.replace('<button id="aiOperationStatus" class="link">前回AI処理の状態・費用を確認</button>','')
 html=html.replace('<script src="./app.js"','<script src="./browser-api.js" defer></script><script src="./app.js"')
 html=re.sub(r'<p class="privacy">.*?</p>','<p class="privacy">資料・入力内容・生成Excelはブラウザ内のメモリで処理し、サーバーへ送信・保存しません。ページを閉じると作業内容は失われます。必要なときだけ「途中データを保存」で端末へ保存できます。初回は読取エンジンのダウンロードに時間がかかります。AIは未接続です。</p>',html)
+html=re.sub(r'<script src="\./(?:browser-api|app|rentroll)\.js" defer></script>','',html)
+html=html.replace('</head>','<link rel="stylesheet" href="./gate.css"></head>')
+gate='''<section class="entry-gate" id="entryGate"><div class="entry-card"><div class="entry-brand">ENJIN ASSET MANAGEMENT</div><h1>物件概要ワークスペース</h1><p>パスワードを入力して、作業を始めてください。</p><form id="entryForm"><label for="entryPassword">パスワード</label><input type="password" id="entryPassword" autocomplete="current-password" required maxlength="64" autofocus><button type="submit" id="entrySubmit">ワークスペースを開く →</button><p id="entryMessage" class="entry-error" role="alert" aria-live="polite"></p></form><p class="entry-foot">資料・Excelはブラウザ内で処理します。</p></div></section>'''
+html=html.replace('<body>','<body>'+gate+'<div id="workspaceApp" hidden>')
+html=html.replace('</body>','</div><script src="./gate.js" defer></script></body>')
 (OUT/'index.html').write_text(html)
 (OUT/'.nojekyll').touch()
 (OUT/'SHA256SUMS.txt').write_text('\n'.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name for p in sorted(OUT.iterdir()) if p.is_file() and p.name!='SHA256SUMS.txt')+'\n')
