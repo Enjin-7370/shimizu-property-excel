@@ -183,7 +183,7 @@ def extract_labels(doc):
             for key,names in ALIASES.items():
                 if doc['kind'] not in SOURCES.get(key,[]): continue
                 for label in sorted(names,key=len,reverse=True):
-                    match=re.match(r'^[・\s]*'+re.escape(label)+r'\s*[:：]\s*(.+)$',line)
+                    match=re.match(r'^[・\s]*'+re.escape(label)+r'(?:\s*[:：|｜]\s*|[ \t]+)([^|｜]+?)\s*[|｜]?$',line)
                     if match:
                         v=match.group(1).strip()
                         if key in NUMERIC:

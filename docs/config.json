@@ -1,10 +1,10 @@
 {
-  "release": "0.4.1-browser",
+  "release": "0.5.0-browser",
   "local": true,
   "auth_ready": true,
   "auth_mode": "browser",
   "ai_ready": false,
-  "ai_note": "AI接続は設定待ちです。画像・自由文は原本を見ながら入力してください。",
+  "ai_note": "画像内の日本語は端末で文字認識します。外部AIは未接続です。",
   "fields": {
     "property_name": {
       "cell": "F4",

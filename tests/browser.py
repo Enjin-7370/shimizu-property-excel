@@ -49,7 +49,7 @@ with sync_playwright() as p:
     assert not page.locator('#workspaceApp').is_visible()
     assert not any('application.zip' in r['url'] or 'pyodide' in r['url'] for r in requests)
     page.locator('#entryPassword').fill(os.environ['SHIMIZU_ENTRY_PASSWORD']);page.locator('#entrySubmit').click()
-    page.wait_for_selector('#field-property_name')
+    page.locator('.memo-option > summary').click();page.locator('.edit-details > summary').click();page.wait_for_selector('#field-property_name')
     page.locator('#sample').click();page.locator('#extract').click()
     page.wait_for_function("!busy",timeout=180000)
     print('NOTICE',page.locator('#notice').inner_text(),'TOAST',page.locator('#toast').inner_text(),flush=True)
@@ -84,12 +84,13 @@ with sync_playwright() as p:
     assert page.locator('#field-land_area_m2').input_value()==''
     page.locator('#newCase').click()
     page.locator('#files').set_input_files(str(OUT/'browser_output.xlsx'))
+    page.wait_for_function('!busy',timeout=180000)
     page.locator('#fileList select').select_option('notes')
     page.locator('#extract').click();page.wait_for_function('!busy',timeout=180000)
     assert page.locator('#sourceSelect option').count()>0
     page.locator('#newCase').click()
     csv=OUT/'rent.csv';csv.write_text('部屋,現況賃料,満室賃料\n101,60000,65000\n102,0,65000\n',encoding='utf-8')
-    page.locator('#files').set_input_files(str(csv));page.locator('#fileList select').select_option('rentroll')
+    page.locator('#files').set_input_files(str(csv));page.wait_for_function('!busy',timeout=180000);page.locator('#fileList select').select_option('rentroll')
     page.locator('#extract').click();page.wait_for_function('!busy',timeout=180000)
     assert page.locator('#rentrollPanel').is_visible()
     page.locator('#rentPeriod').select_option('monthly');page.locator('#rentTax').select_option('exempt');page.locator('#rentDate').fill('2026-11-10')
@@ -106,13 +107,39 @@ with sync_playwright() as p:
     from reportlab.pdfbase.cidfonts import UnicodeCIDFont
     pdfmetrics.registerFont(UnicodeCIDFont('HeiseiKakuGo-W5'))
     pdf=OUT/'fictional.pdf';c=canvas.Canvas(str(pdf));c.setFont('HeiseiKakuGo-W5',12);c.drawString(70,760,'物件名：架空PDF検査物件');c.drawString(70,730,'土地面積：234㎡');c.save()
-    page.locator('#files').set_input_files(str(pdf));page.locator('#fileList select').select_option('notes')
+    page.locator('#files').set_input_files(str(pdf));page.wait_for_function('!busy',timeout=180000);page.locator('#fileList select').select_option('notes')
     page.locator('#extract').click();page.wait_for_function('!busy',timeout=180000)
     assert page.locator('#field-property_name').input_value()=='架空PDF検査物件'
     assert page.locator('#field-land_area_m2').input_value()=='234'
+    # New normal entry point: attach once and download the ready file.
+    page.locator('#newCase').click()
+    auto_file=OUT/'架空自動検査.txt'
+    auto_file.write_text('物件名：自動確認用の架空物件\n土地面積：55㎡',encoding='utf-8')
+    page.locator('#files').set_input_files(str(auto_file))
+    page.wait_for_selector('#readyFile',timeout=180000)
+    assert '地番' in page.locator('#unknowns').inner_text()
+    assert page.locator('#feedbackForm textarea').count()==1
+    first_link=page.locator('#readyFile').get_attribute('href')
+    page.locator('#feedbackText').fill('土地面積は66㎡に訂正。共益費の根拠を確認したい。')
+    page.locator('#feedbackSubmit').click()
+    page.wait_for_function("!busy && !!readyUrl && input('land_area_m2').value==='66'")
+    assert page.locator('#readyFile').get_attribute('href')!=first_link
+    assert '要確認として記録' in page.locator('#feedbackLog').inner_text()
+    with page.expect_download() as dl:page.locator('#readyFile').click()
+    dl.value.save_as(str(OUT/'automatic.xlsx'))
+    from openpyxl import load_workbook
+    assert load_workbook(OUT/'automatic.xlsx').active['K19'].value==66
+    with page.expect_download() as dl:page.locator('#saveFeedback').click()
+    dl.value.save_as(str(OUT/'feedback-state.json'))
+    page.locator('#newCase').click()
+    assert page.locator('#readyFile').is_hidden() and page.locator('#feedbackLog').inner_text()==''
+    page.locator('#stateFile').set_input_files(str(OUT/'feedback-state.json'))
+    page.wait_for_selector('#readyFile',timeout=90000)
+    assert page.locator('#field-land_area_m2').input_value()=='66'
+    assert '共益費の根拠' in page.locator('#feedbackLog').inner_text()
     assert not errors,errors
     assert all(r['method']=='GET' and r['body'] is None for r in requests),requests
-    result={'passed':True,'environment':LIVE_URL or 'local-static','checks':['entry locked initially','incorrect password refused','engine not loaded before unlock','correct password unlock','text extraction','price stays manual','yield','manual correction retained','xlsx download','state save','reset','state restore','preview','mobile width','stale automatic cleared','xlsx intake','csv rentroll intake','rentroll current 720000','rentroll full 1560000','rentroll apply','PDF Japanese text extraction','PDF numeric extraction','no script errors','no outbound upload'],'requests':requests}
+    result={'passed':True,'environment':LIVE_URL or 'local-static','checks':['entry locked initially','incorrect password refused','engine not loaded before unlock','correct password unlock','text extraction','price stays manual','yield','manual correction retained','xlsx download','state save','reset','state restore','preview','mobile width','stale automatic cleared','xlsx intake','csv rentroll intake','rentroll current 720000','rentroll full 1560000','rentroll apply','PDF Japanese text extraction','PDF numeric extraction','no script errors','no outbound upload','automatic file generation','missing fields identified','one feedback textarea','correction updates download','unstructured feedback retained','corrected XLSX cells','feedback state export','reset removes prior file','feedback state restored'],'requests':requests}
     (OUT/('live_results.json' if LIVE_URL else 'browser_results.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({'passed':True,'checks':len(result['checks'])}))
     b.close()

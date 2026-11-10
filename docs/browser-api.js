@@ -17,8 +17,9 @@ const BrowserAPI=(()=>{
    const form=options.body, files=form.getAll('files'),kinds=JSON.parse(form.get('kinds')||'[]');
    if(form.get('use_ai')==='true')throw Error('AIは未接続です。');
    if(files.length>10||files.reduce((n,f)=>n+f.size,0)>25*1024*1024)throw Error('資料は最大10点・合計25MBまでです。');
-   const items=[];for(let i=0;i<files.length;i++){if(files[i].size>8*1024*1024)throw Error('資料は1点8MBまでです。');const bytes=new Uint8Array(await files[i].arrayBuffer());let binary='';for(let offset=0;offset<bytes.length;offset+=16384)binary+=String.fromCharCode(...bytes.subarray(offset,offset+16384));items.push({name:files[i].name,kind:kinds[i],raw_b64:btoa(binary)});}
+   const items=[];for(let i=0;i<files.length;i++){if(files[i].size>(/\.zip$/i.test(files[i].name)?25:8)*1024*1024)throw Error('資料は1点8MBまでです。');const bytes=new Uint8Array(await files[i].arrayBuffer());let binary='';for(let offset=0;offset<bytes.length;offset+=16384)binary+=String.fromCharCode(...bytes.subarray(offset,offset+16384));items.push({name:files[i].name,kind:kinds[i],raw_b64:btoa(binary)});}
    result=await request({action:'extract',files:items,text:String(form.get('text')||'')});
+   if(result.scan_jobs){showNotice('スキャン資料の日本語文字認識を準備しています。初回は辞書を読み込みます。');const read=await LocalOCR.read(result.scan_jobs,msg=>showNotice(msg));result=await request({action:'finish_scan',...read});}
   }else if(path==='/api/rentroll/calculate'){
    result=await request({action:'calculate',payload:JSON.parse(options.body)});
   }else if(path==='/api/export'){

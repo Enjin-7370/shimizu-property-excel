@@ -12,7 +12,7 @@
    const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password.value)))).map(x=>x.toString(16).padStart(2,'0')).join('');
    password.value='';
    if(digest!==expected){message.textContent='パスワードが違います。';password.focus();return;}
-   if(!loaded){await script('./browser-api.js');await Promise.all([script('./app.js'),script('./rentroll.js')]);loaded=true;}
+   if(!loaded){await Promise.all([script('./browser-api.js'),script('./ocr.js')]);await Promise.all([script('./app.js'),script('./rentroll.js')]);loaded=true;}
    document.getElementById('entryGate').remove();document.getElementById('workspaceApp').hidden=false;
    document.querySelector('h1').focus();
   }catch(e){message.textContent=e.message||'画面を開けませんでした。再読み込みしてください。';}
