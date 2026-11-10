@@ -18,7 +18,7 @@ sha=hashlib.sha256((OUT/'application.zip').read_bytes()).hexdigest()
 worker=(OUT/'worker.js').read_text()
 worker=re.sub(r'^const APP_SHA=.*?;\n','',worker)
 (OUT/'worker.js').write_text('const APP_SHA='+json.dumps(sha)+';\n'+worker)
-config=dict(release='0.5.0-browser',local=True,auth_ready=True,auth_mode='browser',ai_ready=False,
+config=dict(release='0.5.1-browser',local=True,auth_ready=True,auth_mode='browser',ai_ready=False,
     ai_note='画像内の日本語は端末で文字認識します。外部AIは未接続です。',
     fields=spec['fields'],numeric_fields=spec['numeric_fields'],defaults=spec['default_company'],
     manual_only=spec['manual_only'],types={'notes':'入力メモ','map':'住宅地図','land':'土地謄本','building':'建物謄本','drawing':'建物図面','rentroll':'レントロール','management':'管理委託契約書','tax':'固定資産税評価証明書','repair':'修繕履歴','zoning':'用途地域図','unknown':'未分類'},remarks_limit=spec['limits']['remarks_chars'])

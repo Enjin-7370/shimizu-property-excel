@@ -177,6 +177,19 @@ def candidate(key,val,doc,page,quote,method='label'):
 
 def extract_labels(doc):
     result=[]
+    if doc['kind']=='management' and doc['pages']:
+        cover=doc['pages'][0]
+        lines=[s.strip() for s in cover['text'].splitlines() if s.strip()]
+        for i,line in enumerate(lines[:-2]):
+            if re.sub(r'\s','',line)!='管理委託契約書':
+                continue
+            title=lines[i+1]
+            if (re.fullmatch(r'[A-Za-z0-9一-龯ぁ-んァ-ヶー・ 　-]{2,60}',title)
+                    and re.search('[一-龯ぁ-んァ-ヶ]',title)
+                    and not re.search('会社|委託|契約|貸主|借主|管理者',title)
+                    and re.match(r'^甲\s*[:：]',lines[i+2])):
+                title=re.sub(r'(?<=[A-Z]) +(?=[一-龯])','',title)
+                result.append(candidate('property_name',title,doc,cover['page'],'\n'.join(lines[i:i+2]),'contract-cover'))
     for p in doc['pages']:
         for line in p['text'].splitlines():
             line=line.strip()

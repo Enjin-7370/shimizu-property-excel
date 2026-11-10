@@ -55,6 +55,11 @@ async function makeReady(){
  link.download=(fields.property_name||'物件').replace(/[\\/:*?"<>|]/g,'_').slice(0,90)+'_物件概要書.xlsx';link.hidden=false;
  $('#draftTitle').textContent=(fields.property_name||'物件概要書')+'のExcelができました';
  const n=Object.keys(evidence).filter(k=>!touched.has(k)).length;
+ if(!n && ![...touched].some(k=>fields[k]!==null && fields[k]!=='')){
+  $('#draftTitle').textContent='この資料からは物件項目を転記できませんでした';
+  draftInfo('自動入力は0件です。下の確認理由を見て、同じ物件のほかの拠出資料を追加するか、指摘欄から入力できます。');link.textContent='空欄の編集用書式を取得';displayReview();return;
+ }
+ link.textContent='編集用Excelをダウンロード ↓';
  draftInfo('資料に根拠のある'+n+'項目を反映。空欄があっても、このまま編集用Excelを取得できます。');displayReview();
 }
 function refreshAfterEdit(){
@@ -267,7 +272,7 @@ async function extract(){
   lastReview={warnings:notes};
   if(result.identity_blocked)lastReview.warnings.unshift('物件の識別情報が一致しません。自動候補を外しました。資料を分けて再作成してください。');
   displayReview();await makeReady();
-  showNotice('編集用Excelを作成しました。確認が必要な項目は結果欄に表示しています。');
+  showNotice($('#draftTitle').textContent);
  }catch(e){if(pendingAI){showNotice('AI処理の結果を確認できません。操作ID：'+pendingAI.id+'。新しいIDで自動再送しません。',true);}if(e.identity_blocked){clearAutoValues();resetRentroll();sources=[];$('#sourcePanel').classList.add('hidden');$('#conflicts').replaceChildren();updateMetrics();}draftFailed(e);toast(e.message);showNotice(e.identity_blocked?'物件を特定できないため、自動値を外しました。資料を分けて読み直してください。':'処理を完了できませんでした。前回の内容を保持しています。今回資料の読取結果ではありません。',true);}finally{setBusy(false);}
 }
 function displaySource(){if(!$('#sourceSelect').value)return;const [id,page]=JSON.parse($('#sourceSelect').value);const d=sources.find(x=>x.id===id);const p=d?.pages.find(x=>x.page===page);$('#sourceText').textContent=p?.text||'文字を抽出できないページです。元の資料を開いて確認してください。';}

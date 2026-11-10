@@ -1,5 +1,5 @@
 {
-  "release": "0.5.0-browser",
+  "release": "0.5.1-browser",
   "local": true,
   "auth_ready": true,
   "auth_mode": "browser",
