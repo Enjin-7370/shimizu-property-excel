@@ -1,0 +1,17 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rXc9WoSIel42HtEp7pExONiBqwCvKC1bI9hjDperrME='; style-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>清水さん用サイト｜既存キーの登録準備</title><style>*{box-sizing:border-box}body{background:#f4f2eb;color:#183747;font:16px/1.6 system-ui,sans-serif;margin:0}main{max-width:620px;margin:8vh auto;padding:30px;background:white;border-top:5px solid #ba7955}h1{font-size:1.45rem}label{display:block;font-weight:bold;margin-top:22px}input,textarea,button{font:inherit;padding:12px;border:1px solid #9cabb2;border-radius:5px;width:100%}textarea{font:13px monospace}button{background:#193e4d;color:white;margin:9px 0;cursor:pointer}button:disabled{opacity:.45}small{overflow-wrap:anywhere}</style></head><body><main><h1>清水さん用サイトに既存キーを設定</h1><small>設定先　enjin-property-worksheet.ormembers2020.chatgpt.site ／ OPENAI_API_KEY</small><p>キーはこの端末内で暗号化します。元の会話に暗号文を渡すと、担当のWorkが復号して対象サイトに設定します。</p><label for="key">OpenAI APIキー</label><input id="key" type="password" autocomplete="off" spellcheck="false"><button id="encrypt">このサイト用に暗号化する</button><p id="msg" role="status"></p><label for="wrapped">元の会話に貼る暗号文</label><textarea id="wrapped" readonly rows="4"></textarea><button id="copy" disabled>暗号文をコピー</button></main><script>const input=document.querySelector('#key'),out=document.querySelector('#wrapped'),msg=document.querySelector('#msg'),copy=document.querySelector('#copy');
+async function wrap(value){
+ const spki=Uint8Array.from(atob('MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAzGCqNGNKLnPrjq6VrBBdpwFi9ukuB4aCuOZZsS4Bz6RPGliq4iz741gGLygRgZ+gOADRptGcWfOnimLZ/9aTXu9z6EwCZpqn0gacIqnsEOomt2OzTh52cPc8kNg8H+A3Z2wgMCdf68JxG0AMXULuA5W2HgRGb4koFrVlWfzyBFnO8/N0HglvnHooNoXjbPguF27FHL4eSuOy/fo/JJ3WLGRUHuIziQYBmZ/RTZY/vqWP6eVipNqVSCMzM4xlkKr96egXdIEdBB3kyK5oLclUHLV9Rlz7IzveZn5I2L8fzsTsuLmFQCSMEcffl+cVqpESklAT5gXW76+r97adkZMCJ2PbiGacqNvWMbtTi+8nChRJKxKdLyhNmQ+CjBXzwnVfEdmCcD/YeSy7vGFr0i4svE+ctIysrGNxR7w2s657OUbJAQRDZr/Se7usjp+otJpgOueV3EWiywh7cyXUhgcucMd03SP9PAIyBU6ZjKm9i98yoKBjURNOUh12SOsc8jdLAgMBAAE='),c=>c.charCodeAt(0));
+ const pub=await crypto.subtle.importKey('spki',spki,{name:'RSA-OAEP',hash:'SHA-256'},false,['encrypt']);
+ const bytes=new Uint8Array(await crypto.subtle.encrypt({name:'RSA-OAEP'},pub,new TextEncoder().encode(value)));
+ return 'ENJIN-WRAPPED-KEY-v1.e4950234c2f7.'+btoa(String.fromCharCode(...bytes));
+}
+document.querySelector('#encrypt').onclick=async()=>{
+ out.value='';copy.disabled=true;
+ try{
+  const v=input.value.trim();
+  if(!/^sk-[A-Za-z0-9_-]{16,300}$/.test(v)) throw Error('OpenAIのキー全体を確認してください。');
+  out.value=await wrap(v);input.value='';copy.disabled=false;msg.textContent='暗号化できました。下のボタンでコピーして元の会話に貼ってください。';
+ }catch(e){msg.textContent=e.message;}
+};
+copy.onclick=async()=>{try{await navigator.clipboard.writeText(out.value);msg.textContent='コピーしました。元の会話に貼ってください。';}catch{out.focus();out.select();msg.textContent='選択した暗号文を手動でコピーしてください。';}};
+</script></body></html>
