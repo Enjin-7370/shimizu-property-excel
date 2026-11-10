@@ -1,5 +1,9 @@
 # 物件概要ワークスペース
 
+公開URL：https://enjin-7370.github.io/shimizu-property-excel/
+
+公開版：v0.4.1-browser。トップの簡易パスワード入口付き。APIは未接続です。
+
 資料をブラウザ内で読み、内容を訂正して、編集可能なExcelをその場でダウンロードするツールです。
 
 - GitHub Pages向け。専用サーバー、データベース、GCP契約は不要。
